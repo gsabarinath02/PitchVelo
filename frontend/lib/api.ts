@@ -68,35 +68,35 @@ export interface PageVisitUpdate {
   duration_seconds: number;
 }
 
-// Auth API
+// Auth API - Fixed endpoints to match backend routes
 export const authAPI = {
-  login: (data: LoginRequest) => api.post<TokenResponse>('/auth/login', data),
+  login: (data: LoginRequest) => api.post<TokenResponse>('/auth/auth/login', data),
   signup: (data: LoginRequest & { username: string; role?: string }) => 
-    api.post<User>('/auth/signup', data),
-  getMe: () => api.get<User>('/auth/me'),
+    api.post<User>('/auth/auth/signup', data),
+  getMe: () => api.get<User>('/auth/auth/me'),
 };
 
-// Users API
+// Users API - Fixed endpoints to match backend routes
 export const usersAPI = {
-  getAll: () => api.get<User[]>('/users/'),
+  getAll: () => api.get<User[]>('/users/users/'),
   create: (data: LoginRequest & { username: string; role?: string }) => 
-    api.post<User>('/users/', data),
+    api.post<User>('/users/users/', data),
 };
 
-// Forms API
+// Forms API - Fixed endpoints to match backend routes
 export const formsAPI = {
-  submit: (data: FormSubmission) => api.post('/forms/submit', data),
-  getSubmissions: () => api.get('/forms/submissions'),
-  getMySubmission: () => api.get('/forms/my-submission'),
+  submit: (data: FormSubmission) => api.post('/forms/forms/submit', data),
+  getSubmissions: () => api.get('/forms/forms/submissions'),
+  getMySubmission: () => api.get('/forms/forms/my-submission'),
 };
 
-// Analytics API
+// Analytics API - Fixed endpoints to match backend routes
 export const analyticsAPI = {
-  createPageVisit: (data: PageVisit) => api.post('/analytics/page-visit', data),
+  createPageVisit: (data: PageVisit) => api.post('/analytics/analytics/page-visit', data),
   updatePageVisit: (visitId: number, data: PageVisitUpdate) => 
-    api.put(`/analytics/page-visit/${visitId}`, data),
-  getUserAnalytics: () => api.get('/analytics/user-analytics'),
-  getMyAnalytics: () => api.get('/analytics/my-analytics'),
+    api.put(`/analytics/analytics/page-visit/${visitId}`, data),
+  getUserAnalytics: () => api.get('/analytics/analytics/user-analytics'),
+  getMyAnalytics: () => api.get('/analytics/analytics/my-analytics'),
 };
 
 export default api; 
