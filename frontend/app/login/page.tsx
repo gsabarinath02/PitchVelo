@@ -7,7 +7,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Eye, EyeOff, Lock, Mail, User, ArrowRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { authAPI } from '@/lib/api';
-import axios from 'axios';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -29,13 +28,8 @@ export default function LoginPage() {
       // Store token in localStorage first
       localStorage.setItem('token', access_token);
       
-      // Get user info with direct axios call to avoid timing issues
-      const userResponse = await axios.get('http://localhost:8000/auth/me', {
-        headers: {
-          'Authorization': `Bearer ${access_token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      // Get user info using the authAPI utility
+      const userResponse = await authAPI.getMe();
       const user = userResponse.data;
       
       // Update auth context
