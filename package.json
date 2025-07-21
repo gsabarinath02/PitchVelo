@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@shadcn/ui": "^0.0.4",
+    "clsx": "^2.1.1",
+    "react-scroll-parallax": "^3.4.5",
+    "tailwind-merge": "^3.3.1"
+  }
+}

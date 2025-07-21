@@ -36,7 +36,13 @@ export default function LoginPage() {
       login(access_token, user);
       
       toast.success('Welcome back!');
-      router.push('/dashboard');
+      
+      // Redirect based on user role
+      if (user.role === 'admin') {
+        router.push('/admin');
+      } else {
+        router.push('/presentation');
+      }
     } catch (error: any) {
       toast.error(error.response?.data?.detail || 'Login failed');
     } finally {

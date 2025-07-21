@@ -54,7 +54,7 @@ def create_admin_user():
             return
         
         # Create admin user
-        hashed_password = get_password_hash("veloscope@123")
+        hashed_password = get_password_hash("veloadmin123")
         admin_user = User(
             email="admin@veloscope.com",
             username="admin",
@@ -66,7 +66,7 @@ def create_admin_user():
         db.commit()
         print("✅ Admin user created successfully!")
         print("   Email: admin@veloscope.com")
-        print("   Password: veloscope@123")
+        print("   Password: veloadmin123")
         
     except Exception as e:
         print(f"❌ Error creating admin user: {e}")
@@ -93,7 +93,7 @@ def main():
     print("\n📝 Next steps:")
     print("1. Start the application: docker-compose up")
     print("2. Access the frontend: http://localhost:3000")
-    print("3. Login with admin@veloscope.com / veloscope@123")
+    print("3. Login with admin@veloscope.com / veloadmin123")
     print("4. View API docs: http://localhost:8000/docs")
 
 if __name__ == "__main__":

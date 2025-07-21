@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import AdminUserTable from '@/components/AdminUserTable';
 import AnalyticsTable from '@/components/AnalyticsTable';
 import SubmissionsTable from '@/components/SubmissionsTable';
@@ -38,59 +39,52 @@ export default function AdminPage() {
     avgRating: 0
   });
 
+  const refreshData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const [usersResponse, analyticsResponse] = await Promise.all([
+        usersAPI.getAll(),
+        analyticsAPI.getSimplifiedAnalytics(),
+      ]);
+      
+      setUsers(usersResponse.data);
+      setAnalytics(analyticsResponse.data);
+      
+      // Calculate stats from simplified analytics
+      const totalUsers = usersResponse.data.length;
+      const totalVisits = analyticsResponse.data.reduce((acc: number, user: any) => 
+        acc + user.total_logins, 0);
+      const totalSubmissions = analyticsResponse.data.reduce((acc: number, user: any) => 
+        acc + (user.has_submitted_form ? 1 : 0), 0);
+      const totalTimeSpent = analyticsResponse.data.reduce((acc: number, user: any) => 
+        acc + user.total_time_spent_seconds, 0);
+
+      setStats({
+        totalUsers,
+        totalVisits,
+        totalSubmissions,
+        avgRating: totalUsers > 0 ? Math.round((totalSubmissions / totalUsers) * 5) : 0
+      });
+    } catch (error: any) {
+      console.error('Failed to refresh admin data:', error);
+      setError(error.response?.data?.detail || 'Failed to refresh admin data');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (!token) {
       router.push('/login');
       return;
     }
 
-    if (user?.role !== 'admin') {
-      router.push('/dashboard');
-      return;
-    }
-
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        
-        const [usersResponse, analyticsResponse] = await Promise.all([
-          usersAPI.getAll(),
-          analyticsAPI.getSimplifiedAnalytics(),
-        ]);
-        
-        setUsers(usersResponse.data);
-        setAnalytics(analyticsResponse.data);
-        
-        // Calculate stats from simplified analytics
-        const totalUsers = usersResponse.data.length;
-        const totalVisits = analyticsResponse.data.reduce((acc: number, user: any) => 
-          acc + user.total_logins, 0);
-        const totalSubmissions = analyticsResponse.data.reduce((acc: number, user: any) => 
-          acc + (user.has_submitted_form ? 1 : 0), 0);
-        const totalTimeSpent = analyticsResponse.data.reduce((acc: number, user: any) => 
-          acc + user.total_time_spent_seconds, 0);
-
-        setStats({
-          totalUsers,
-          totalVisits,
-          totalSubmissions,
-          avgRating: totalUsers > 0 ? Math.round((totalSubmissions / totalUsers) * 5) : 0
-        });
-      } catch (error: any) {
-        console.error('Failed to fetch admin data:', error);
-        setError(error.response?.data?.detail || 'Failed to load admin data');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
+    refreshData();
   }, [token, user, router]);
 
-  if (!user || user.role !== 'admin') {
-    return null;
-  }
+
 
   if (isLoading) {
     return (
@@ -111,7 +105,7 @@ export default function AdminPage() {
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Dashboard</h2>
           <p className="text-gray-600 mb-4">{error}</p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={refreshData}
             className="btn-primary"
           >
             Retry
@@ -140,27 +134,28 @@ export default function AdminPage() {
   );
 
   return (
-    <div className="min-h-screen gradient-bg">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-8"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                Admin Dashboard
-              </h1>
-              <p className="text-gray-600">
-                Welcome back, {user.username}! Here's what's happening with your platform.
-              </p>
-            </div>
+    <ProtectedRoute allowedRoles={['admin']}>
+      <div className="min-h-screen gradient-bg">
+        <div className="container mx-auto px-4 py-8">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                  Admin Dashboard
+                </h1>
+                <p className="text-gray-600">
+                  Welcome back, {user?.username}! Here's what's happening with your platform.
+                </p>
+              </div>
             <div className="flex items-center space-x-4">
               <button
-                onClick={() => router.push('/')}
+                onClick={() => router.push('/presentation')}
                 className="btn-primary flex items-center space-x-2"
               >
                 <Play className="h-4 w-4" />
@@ -316,7 +311,7 @@ export default function AdminPage() {
             )}
             
             {activeTab === 'users' && (
-              <AdminUserTable users={users} />
+              <AdminUserTable users={users} onUserChange={refreshData} />
             )}
             
             {activeTab === 'analytics' && (
@@ -330,5 +325,6 @@ export default function AdminPage() {
         </AnimatePresence>
       </div>
     </div>
+    </ProtectedRoute>
   );
 } 

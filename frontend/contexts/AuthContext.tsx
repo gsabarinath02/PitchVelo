@@ -57,7 +57,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // Track logout event before clearing data
       if (token) {
-        await authAPI.logout();
+        try {
+          await authAPI.logout();
+        } catch (error) {
+          // If the regular logout fails, try with a direct fetch
+          console.warn('Regular logout failed, trying direct approach:', error);
+          try {
+            await fetch('http://localhost:8000/analytics/analytics/logout', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({}),
+            });
+          } catch (fetchError) {
+            console.error('Direct logout also failed:', fetchError);
+          }
+        }
       }
     } catch (error) {
       console.error('Failed to track logout event:', error);

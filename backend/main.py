@@ -56,7 +56,7 @@ try:
     redis_client.ping()
     logger.info("Redis connection established")
 except Exception as e:
-    logger.error(f"Redis connection failed: {e}")
+    logger.warning(f"Redis connection failed (optional): {e}")
     redis_client = None
 
 # Initialize rate limiter
@@ -101,6 +101,7 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
     expose_headers=["*"],
+    max_age=86400,  # Cache preflight responses for 24 hours
 )
 
 # Prometheus metrics

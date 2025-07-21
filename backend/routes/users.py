@@ -50,4 +50,31 @@ def create_user(
     db.commit()
     db.refresh(db_user)
     
-    return db_user 
+    return db_user
+
+@router.delete("/{user_id}")
+def delete_user(
+    user_id: int,
+    current_user: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db)
+):
+    # Prevent admin from deleting themselves
+    if user_id == current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot delete your own account"
+        )
+    
+    # Find the user to delete
+    db_user = db.query(User).filter(User.id == user_id).first()
+    if not db_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Delete the user
+    db.delete(db_user)
+    db.commit()
+    
+    return {"message": "User deleted successfully"} 

@@ -1,36 +1,37 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import PresentationViewer from '@/components/PresentationViewer';
 import FormSubmission from '@/components/FormSubmission';
 import FormSubmissionDetails from '@/components/FormSubmissionDetails';
 import SubmissionSuccess from '@/components/SubmissionSuccess';
-import { analyticsAPI } from '@/lib/api';
+import { createPageTracker } from '@/lib/tracking';
 import { 
   User, 
   LogOut, 
-  Settings, 
   BarChart3, 
   BookOpen,
   ChevronRight,
   Play,
   CheckCircle,
   FileText,
-  Eye
+  Eye,
+  ArrowLeft
 } from 'lucide-react';
 
-export default function DashboardPage() {
+export default function PresentationPage() {
   const { user, token, logout } = useAuth();
   const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showForm, setShowForm] = useState(false);
   const [showSubmissionDetails, setShowSubmissionDetails] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [pageVisitId, setPageVisitId] = useState<number | null>(null);
   const [showNavigation, setShowNavigation] = useState(false);
+  const pageTrackerRef = useRef<ReturnType<typeof createPageTracker> | null>(null);
 
   useEffect(() => {
     if (!token) {
@@ -38,34 +39,16 @@ export default function DashboardPage() {
       return;
     }
 
-    // Track page visit
-    const trackPageVisit = async () => {
-      try {
-        const response = await analyticsAPI.createPageVisit({ page_name: 'dashboard' });
-        setPageVisitId(response.data.id);
-      } catch (error) {
-        console.error('Failed to track page visit:', error);
-      }
-    };
+    // Initialize page tracker
+    pageTrackerRef.current = createPageTracker('presentation');
     
-    trackPageVisit();
-
-    // Track page exit
-    const handleBeforeUnload = async () => {
-      if (pageVisitId) {
-        try {
-          await analyticsAPI.updatePageVisit(pageVisitId, {
-            exit_time: new Date().toISOString(),
-            duration_seconds: Date.now() / 1000,
-          });
-        } catch (error) {
-          console.error('Failed to update page visit:', error);
-        }
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    // Start tracking
+    pageTrackerRef.current.startTracking();
+    
+    // Setup exit handlers
+    const cleanup = pageTrackerRef.current.setupPageExitHandlers();
+    
+    return cleanup;
   }, [token, router]);
 
   const handleLogout = () => {
@@ -73,14 +56,23 @@ export default function DashboardPage() {
     router.push('/login');
   };
 
+  const handleBackToAdmin = () => {
+    if (user?.role === 'admin') {
+      router.push('/admin');
+    } else {
+      router.push('/presentation');
+    }
+  };
+
   if (!user) {
     return null;
   }
 
   return (
-    <div className="min-h-screen gradient-bg">
-      {/* Header */}
-      <motion.header
+    <ProtectedRoute allowedRoles={['user', 'admin']}>
+      <div className="min-h-screen gradient-bg">
+        {/* Header */}
+        <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className="bg-white shadow-sm border-b border-gray-200"
@@ -88,6 +80,13 @@ export default function DashboardPage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
+              <button
+                onClick={handleBackToAdmin}
+                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                <span>Back to Dashboard</span>
+              </button>
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
                   <BookOpen className="h-5 w-5 text-white" />
@@ -127,11 +126,11 @@ export default function DashboardPage() {
                       <span>My Submission</span>
                     </button>
                     <button
-                      onClick={() => router.push('/admin')}
+                      onClick={handleBackToAdmin}
                       className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
                     >
                       <BarChart3 className="h-4 w-4" />
-                      <span>Admin Dashboard</span>
+                      <span>{user.role === 'admin' ? 'Admin Dashboard' : 'Presentation'}</span>
                     </button>
                     <button
                       onClick={handleLogout}
@@ -194,30 +193,8 @@ export default function DashboardPage() {
                 </button>
               )}
             </div>
-            </div>
+          </div>
         </motion.div>
-
-        {/* Progress Indicator */}
-        {!showForm && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="mb-4"
-          >
-            <div className="flex items-center space-x-2">
-              <div className="flex-1 bg-gray-200 rounded-full h-1.5 sm:h-2">
-                <div 
-                  className="bg-primary-600 h-1.5 sm:h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${((currentSlide + 1) / 5) * 100}%` }}
-                ></div>
-              </div>
-              <span className="text-xs sm:text-sm text-gray-600">
-                {Math.round(((currentSlide + 1) / 5) * 100)}% Complete
-              </span>
-            </div>
-          </motion.div>
-        )}
 
         {/* Content Area */}
         <motion.div
@@ -282,5 +259,6 @@ export default function DashboardPage() {
         </motion.div>
       </div>
     </div>
+    </ProtectedRoute>
   );
 } 

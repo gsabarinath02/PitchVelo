@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Plus, Edit, Trash2, User, Shield } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, Edit, Trash2, User, Shield, AlertTriangle, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { usersAPI } from '@/lib/api';
 
@@ -16,11 +16,17 @@ interface User {
 
 interface AdminUserTableProps {
   users: User[];
+  onUserChange?: () => void;
 }
 
-export default function AdminUserTable({ users }: AdminUserTableProps) {
+export default function AdminUserTable({ users, onUserChange }: AdminUserTableProps) {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  
+  // Get current user from localStorage to check if it's the current admin
+  const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
 
   const handleCreateUser = async (formData: any) => {
     setIsCreating(true);
@@ -28,12 +34,37 @@ export default function AdminUserTable({ users }: AdminUserTableProps) {
       await usersAPI.create(formData);
       toast.success('User created successfully!');
       setShowCreateForm(false);
-      // Refresh the page to get updated data
-      window.location.reload();
+      // Call the refresh function instead of reloading the page
+      if (onUserChange) {
+        onUserChange();
+      }
     } catch (error: any) {
       toast.error(error.response?.data?.detail || 'Failed to create user');
     } finally {
       setIsCreating(false);
+    }
+  };
+
+  const handleDeleteUser = async (user: User) => {
+    setIsDeleting(true);
+    try {
+      await usersAPI.delete(user.id);
+      toast.success(`User ${user.username} deleted successfully!`);
+      setUserToDelete(null);
+      // Call the refresh function instead of reloading the page
+      if (onUserChange) {
+        onUserChange();
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.detail || 'Failed to delete user';
+      toast.error(errorMessage);
+      
+      // If it's a "cannot delete yourself" error, close the dialog
+      if (errorMessage.includes('Cannot delete your own account')) {
+        setUserToDelete(null);
+      }
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -112,10 +143,26 @@ export default function AdminUserTable({ users }: AdminUserTableProps) {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex space-x-2">
-                    <button className="text-primary-600 hover:text-primary-900">
+                    <button 
+                      className="text-primary-600 hover:text-primary-900 transition-colors"
+                      title="Edit user"
+                    >
                       <Edit className="h-4 w-4" />
                     </button>
-                    <button className="text-red-600 hover:text-red-900">
+                    <button 
+                      onClick={() => setUserToDelete(user)}
+                      className={`transition-colors ${
+                        user.id === currentUser.id 
+                          ? 'text-gray-400 cursor-not-allowed' 
+                          : 'text-red-600 hover:text-red-900'
+                      }`}
+                      title={
+                        user.id === currentUser.id 
+                          ? "Cannot delete your own account" 
+                          : "Delete user"
+                      }
+                      disabled={user.id === currentUser.id}
+                    >
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
@@ -126,6 +173,7 @@ export default function AdminUserTable({ users }: AdminUserTableProps) {
         </table>
       </div>
 
+      {/* Create User Form */}
       {showCreateForm && (
         <CreateUserForm
           onSubmit={handleCreateUser}
@@ -133,6 +181,149 @@ export default function AdminUserTable({ users }: AdminUserTableProps) {
           isLoading={isCreating}
         />
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <AnimatePresence>
+        {userToDelete && (
+          <DeleteConfirmationDialog
+            user={userToDelete}
+            onConfirm={() => handleDeleteUser(userToDelete)}
+            onCancel={() => setUserToDelete(null)}
+            isLoading={isDeleting}
+          />
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+interface DeleteConfirmationDialogProps {
+  user: User;
+  onConfirm: () => void;
+  onCancel: () => void;
+  isLoading: boolean;
+}
+
+function DeleteConfirmationDialog({ user, onConfirm, onCancel, isLoading }: DeleteConfirmationDialogProps) {
+  const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+  const isCurrentUser = user.id === currentUser.id;
+  
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        className="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4 overflow-hidden"
+      >
+        {/* Header */}
+        <div className="bg-red-50 px-6 py-4 border-b border-red-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center justify-center w-10 h-10 bg-red-100 rounded-full">
+                <AlertTriangle className="h-5 w-5 text-red-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">Delete User</h3>
+            </div>
+            <button
+              onClick={onCancel}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="px-6 py-6">
+          <div className="mb-6">
+            <p className="text-gray-700 mb-4">
+              Are you sure you want to delete the user <strong>{user.username}</strong>?
+            </p>
+            
+            {isCurrentUser && (
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
+                <div className="flex items-start space-x-3">
+                  <AlertTriangle className="h-5 w-5 text-orange-600 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-orange-800 mb-1">Warning: Current User</p>
+                    <p className="text-sm text-orange-700">
+                      You are trying to delete your own account. This action is not allowed for security reasons.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="flex items-start space-x-3">
+                <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-red-800 mb-1">This action cannot be undone</p>
+                  <p className="text-sm text-red-700">
+                    This will permanently delete the user account and all associated data including:
+                  </p>
+                  <ul className="text-sm text-red-700 mt-2 space-y-1">
+                    <li>• User profile and settings</li>
+                    <li>• Form submissions and feedback</li>
+                    <li>• Analytics and tracking data</li>
+                    <li>• Login/logout history</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* User Info */}
+          <div className="bg-gray-50 rounded-lg p-4 mb-6">
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center justify-center w-8 h-8 bg-primary-100 rounded-full">
+                <User className="h-4 w-4 text-primary-600" />
+              </div>
+              <div>
+                <p className="font-medium text-gray-900">{user.username}</p>
+                <p className="text-sm text-gray-500">{user.email}</p>
+                <p className="text-sm text-gray-500">
+                  Role: <span className="capitalize">{user.role}</span> • 
+                  Created: {new Date(user.created_at).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex space-x-3">
+            <button
+              onClick={onCancel}
+              disabled={isLoading}
+              className="btn-secondary flex-1"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={onConfirm}
+              disabled={isLoading || isCurrentUser}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors flex-1 flex items-center justify-center ${
+                isCurrentUser 
+                  ? 'bg-gray-400 cursor-not-allowed text-white' 
+                  : 'bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white'
+              }`}
+            >
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  {isCurrentUser ? 'Cannot Delete Self' : 'Delete User'}
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 }
