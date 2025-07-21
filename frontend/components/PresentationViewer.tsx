@@ -139,7 +139,7 @@ const slides = [
           </motion.div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
           {[
             { icon: "🏃‍♂️", title: "Current Partnership", desc: "Successfully managing photography and videography for Maha Marathon series across Maharashtra" },
             { icon: "🚀", title: "Next Evolution", desc: "Introducing comprehensive event management platform with AI-powered solutions" },
@@ -147,15 +147,15 @@ const slides = [
           ].map((item, index) => (
           <motion.div 
               key={index}
-              className="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 hover:scale-105"
+              className="bg-white/80 backdrop-blur-sm rounded-xl p-3 sm:p-4 text-center shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 hover:scale-105"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 + index * 0.1 }}
             whileHover={{ y: -5 }}
           >
-              <div className="text-3xl mb-2">{item.icon}</div>
-              <h3 className="text-lg font-bold mb-2 text-gray-800">{item.title}</h3>
-              <p className="text-gray-600 leading-relaxed text-sm">{item.desc}</p>
+              <div className="text-2xl sm:text-3xl mb-2">{item.icon}</div>
+              <h3 className="text-base sm:text-lg font-bold mb-2 text-gray-800">{item.title}</h3>
+              <p className="text-gray-600 leading-relaxed text-xs sm:text-sm">{item.desc}</p>
           </motion.div>
           ))}
         </div>
@@ -211,7 +211,7 @@ const slides = [
           </div>
           </motion.div>
           
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {[
             { icon: "📋", title: "Smart Registration System", desc: "Seamless participant registration with payment gateway integration. Only ₹10 per participant for EventForce subscribers vs ₹25 for regular users" },
             { icon: "🤖", title: "AI-Powered Support Desk", desc: "24/7 automated customer support with intelligent query resolution and escalation to human agents when needed" },
@@ -222,15 +222,15 @@ const slides = [
           ].map((item, index) => (
           <motion.div 
               key={index}
-              className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 hover:scale-105"
+              className="bg-white/80 backdrop-blur-sm rounded-xl p-3 sm:p-4 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 hover:scale-105"
               initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
-              animate={{ opacity: 1, x: 0 }}
+            animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 + index * 0.1 }}
             whileHover={{ y: -5 }}
           >
-              <div className="text-3xl mb-2">{item.icon}</div>
-              <h3 className="text-lg font-bold mb-2 text-gray-800">{item.title}</h3>
-              <p className="text-gray-600 leading-relaxed text-sm">{item.desc}</p>
+              <div className="text-2xl sm:text-3xl mb-2">{item.icon}</div>
+              <h3 className="text-base sm:text-lg font-bold mb-2 text-gray-800">{item.title}</h3>
+              <p className="text-gray-600 leading-relaxed text-xs sm:text-sm">{item.desc}</p>
           </motion.div>
           ))}
         </div>
@@ -270,7 +270,7 @@ const slides = [
           </div>
           </motion.div>
           
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {[
             { icon: "🎨", title: "Social Media Strategy", desc: "Comprehensive social media calendar, content creation, and strategic posting (3 posts/week per event)" },
             { icon: "📸", title: "Photography & Video", desc: "Continued excellence in event photography with advanced face and BIB tagging at ₹1.25 per image (vs ₹2.50 regular)" },
@@ -281,15 +281,15 @@ const slides = [
           ].map((item, index) => (
           <motion.div 
               key={index}
-              className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 hover:scale-105"
+              className="bg-white/80 backdrop-blur-sm rounded-xl p-3 sm:p-4 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 hover:scale-105"
               initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 + index * 0.1 }}
             whileHover={{ y: -5 }}
           >
-              <div className="text-3xl mb-2">{item.icon}</div>
-              <h3 className="text-lg font-bold mb-2 text-gray-800">{item.title}</h3>
-              <p className="text-gray-600 leading-relaxed text-sm">{item.desc}</p>
+              <div className="text-2xl sm:text-3xl mb-2">{item.icon}</div>
+              <h3 className="text-base sm:text-lg font-bold mb-2 text-gray-800">{item.title}</h3>
+              <p className="text-gray-600 leading-relaxed text-xs sm:text-sm">{item.desc}</p>
           </motion.div>
           ))}
         </div>
@@ -336,7 +336,7 @@ const slides = [
         </motion.div>
 
         <motion.div 
-          className="grid grid-cols-2 md:grid-cols-4 gap-3"
+          className="grid grid-cols-2 gap-3"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
@@ -347,8 +347,8 @@ const slides = [
             { value: "₹1.20", label: "Per Additional Message" },
             { value: "₹1.25", label: "Per Image Tagging" }
           ].map((stat, index) => (
-            <div key={index} className="bg-gradient-to-br from-pink-500 to-red-600 text-white p-4 rounded-xl text-center shadow-lg">
-              <div className="text-xl font-bold mb-1">{stat.value}</div>
+            <div key={index} className="bg-gradient-to-br from-pink-500 to-red-600 text-white p-3 sm:p-4 rounded-xl text-center shadow-lg">
+              <div className="text-lg sm:text-xl font-bold mb-1">{stat.value}</div>
               <div className="text-xs opacity-90">{stat.label}</div>
           </div>
           ))}
@@ -396,7 +396,7 @@ const slides = [
     ),
     content: (
       <div className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {[
             { icon: "🏆", title: "Proven Track Record", desc: "Years of successful partnership in photography and videography for Maha Marathon series" },
             { icon: "💰", title: "Significant Cost Savings", desc: "33% discount on platform subscription + preferential pricing on all services" },
@@ -407,15 +407,15 @@ const slides = [
           ].map((item, index) => (
           <motion.div 
               key={index}
-              className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 hover:scale-105"
+              className="bg-white/80 backdrop-blur-sm rounded-xl p-3 sm:p-4 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 hover:scale-105"
               initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
+            animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 + index * 0.1 }}
             whileHover={{ y: -5 }}
           >
-              <div className="text-3xl mb-2">{item.icon}</div>
-              <h3 className="text-lg font-bold mb-2 text-gray-800">{item.title}</h3>
-              <p className="text-gray-600 leading-relaxed text-sm">{item.desc}</p>
+              <div className="text-2xl sm:text-3xl mb-2">{item.icon}</div>
+              <h3 className="text-base sm:text-lg font-bold mb-2 text-gray-800">{item.title}</h3>
+              <p className="text-gray-600 leading-relaxed text-xs sm:text-sm">{item.desc}</p>
           </motion.div>
           ))}
         </div>
@@ -472,7 +472,7 @@ const slides = [
 
         <div className="text-center mb-4">
           <h3 className="text-2xl font-bold text-gray-800 mb-4">Next Steps</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
             {[
               { icon: "🤝", title: "Partnership Discussion", desc: "Detailed discussion about your specific requirements and customization needs" },
               { icon: "💻", title: "Book a live demo", desc: "Hands-on demonstration of EventForce platform and Veloscope creative solutions" },
@@ -480,15 +480,15 @@ const slides = [
             ].map((item, index) => (
             <motion.div 
                 key={index}
-                className="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 hover:scale-105"
+                className="bg-white/80 backdrop-blur-sm rounded-xl p-3 sm:p-4 text-center shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 hover:scale-105"
                 initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
+              animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 + index * 0.1 }}
               whileHover={{ y: -5 }}
             >
-                <div className="text-3xl mb-2">{item.icon}</div>
-                <h3 className="text-lg font-bold mb-2 text-gray-800">{item.title}</h3>
-                <p className="text-gray-600 leading-relaxed text-sm">{item.desc}</p>
+                <div className="text-2xl sm:text-3xl mb-2">{item.icon}</div>
+                <h3 className="text-base sm:text-lg font-bold mb-2 text-gray-800">{item.title}</h3>
+                <p className="text-gray-600 leading-relaxed text-xs sm:text-sm">{item.desc}</p>
             </motion.div>
             ))}
           </div>
@@ -530,6 +530,8 @@ export default function PresentationViewer({ currentSlide, setCurrentSlide, onCo
   const [containerHeight, setContainerHeight] = useState(600);
   const [contentScale, setContentScale] = useState(1);
   const [isScaled, setIsScaled] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [showScrollHint, setShowScrollHint] = useState(false);
 
   // Calculate perfect fit dimensions
   useEffect(() => {
@@ -537,23 +539,31 @@ export default function PresentationViewer({ currentSlide, setCurrentSlide, onCo
       // Get the actual available space for the presentation
       const viewportHeight = window.innerHeight;
       const viewportWidth = window.innerWidth;
-      const availableHeight = Math.max(500, viewportHeight - 80); // Reduced buffer from 100px to 80px
+      const availableHeight = Math.max(500, viewportHeight - 100); // Increased buffer for mobile
       
       setContainerHeight(availableHeight);
       
       // Calculate content scaling if needed - be more lenient with scaling
       if (contentRef.current && containerRef.current) {
         const contentHeight = contentRef.current.scrollHeight;
-        const availableContentHeight = availableHeight - 140; // Reduced from 160px to 140px
+        const availableContentHeight = availableHeight - 160; // Increased buffer for mobile
         
-        // Only scale if content is significantly larger
-        if (contentHeight > availableContentHeight * 1.1) {
-          const scale = Math.max(0.75, availableContentHeight / contentHeight); // Increased min scale from 0.6 to 0.75
+        // Only scale if content is significantly larger - be more lenient on mobile
+        const mobileCheck = viewportWidth < 768;
+        setIsMobile(mobileCheck);
+        const scaleThreshold = mobileCheck ? 1.2 : 1.05; // Higher threshold on mobile
+        const minScale = mobileCheck ? 0.8 : 0.7; // Higher min scale on mobile
+        
+        if (contentHeight > availableContentHeight * scaleThreshold) {
+          const scale = Math.max(minScale, availableContentHeight / contentHeight);
           setContentScale(scale);
           setIsScaled(true);
+          setShowScrollHint(true);
         } else {
           setContentScale(1);
           setIsScaled(false);
+          // Check if content is still scrollable even without scaling
+          setShowScrollHint(contentHeight > availableContentHeight);
         }
     }
   };
@@ -569,9 +579,24 @@ export default function PresentationViewer({ currentSlide, setCurrentSlide, onCo
     
     window.addEventListener('resize', calculateDimensions);
     
+    // Add scroll listener to hide hint after scrolling
+    const handleScroll = () => {
+      if (showScrollHint) {
+        setShowScrollHint(false);
+      }
+    };
+    
+    const contentElement = contentRef.current;
+    if (contentElement) {
+      contentElement.addEventListener('scroll', handleScroll, { passive: true });
+    }
+    
     return () => {
       resizeObserver.disconnect();
       window.removeEventListener('resize', calculateDimensions);
+      if (contentElement) {
+        contentElement.removeEventListener('scroll', handleScroll);
+      }
     };
   }, [currentSlide]);
 
@@ -582,7 +607,7 @@ export default function PresentationViewer({ currentSlide, setCurrentSlide, onCo
       
       <div
         ref={containerRef}
-        className="relative max-w-[1400px] w-[95vw] min-w-[320px] mx-auto rounded-3xl overflow-visible shadow-2xl flex flex-col items-center justify-center"
+        className="relative max-w-[1400px] w-[98vw] sm:w-[95vw] min-w-[280px] mx-auto rounded-2xl sm:rounded-3xl overflow-visible shadow-2xl flex flex-col items-center justify-center"
         style={{ height: containerHeight, minHeight: '500px', maxHeight: '95vh' }}
       >
         {/* Dynamic parallax background */}
@@ -597,16 +622,16 @@ export default function PresentationViewer({ currentSlide, setCurrentSlide, onCo
             animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -50 }}
               transition={{ duration: 0.5, ease: 'easeOut' }}
-              className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl border-2 border-purple-400/50 w-full h-full flex flex-col justify-between items-center group p-3 md:p-6"
+              className="bg-white/95 backdrop-blur-lg rounded-2xl sm:rounded-3xl shadow-2xl border-2 border-purple-400/50 w-full h-full flex flex-col justify-between items-center group p-2 sm:p-3 md:p-6"
               style={{ 
                 boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 32px 4px rgba(167, 139, 250, 0.3)',
                 animation: 'glow 2.5s ease-in-out infinite alternate'
               }}
             >
               {/* Header - Fixed height */}
-              <div className="text-center mb-3 flex-shrink-0">
+              <div className="text-center mb-2 sm:mb-3 flex-shrink-0">
               <motion.h1 
-                  className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent drop-shadow-lg"
+                  className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-1 sm:mb-2 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent drop-shadow-lg"
                   initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
@@ -615,7 +640,7 @@ export default function PresentationViewer({ currentSlide, setCurrentSlide, onCo
                 {slide.title}
               </motion.h1>
               <motion.p 
-                  className="text-sm md:text-base lg:text-lg text-gray-600 font-medium"
+                  className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-600 font-medium"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
@@ -628,14 +653,16 @@ export default function PresentationViewer({ currentSlide, setCurrentSlide, onCo
               {/* Content - Flexible height with optimized scaling */}
             <motion.div 
                 ref={contentRef}
-                className="flex-1 w-full flex flex-col items-center justify-center px-2 md:px-4 overflow-hidden"
+                className="flex-1 w-full flex flex-col items-center justify-start px-1 sm:px-2 md:px-4 overflow-y-auto overflow-x-hidden scrollbar-hide py-2"
                 initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
                 style={{ 
                   transform: `scale(${contentScale})`,
                   transformOrigin: 'center center',
-                  transition: 'transform 0.3s cubic-bezier(0.4,0,0.2,1)'
+                  transition: 'transform 0.3s cubic-bezier(0.4,0,0.2,1)',
+                  maxHeight: 'calc(100% - 120px)', // Reserve space for header and navigation
+                  scrollBehavior: 'smooth'
                 }}
             >
               {slide.content}
@@ -649,20 +676,36 @@ export default function PresentationViewer({ currentSlide, setCurrentSlide, onCo
                     Scaled
                   </div>
                 )}
+                
+                {/* Scroll indicator for mobile */}
+                {isMobile && showScrollHint && (
+                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex items-center text-xs text-gray-500 bg-white/80 px-2 py-1 rounded-full shadow-md animate-bounce">
+                    <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path d="M7 13l5 5 5-5M7 6l5 5 5-5" />
+                    </svg>
+                    Scroll
+                  </div>
+                )}
+                
+                {/* Fade effect at bottom for mobile */}
+                {isMobile && showScrollHint && (
+                  <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/80 to-transparent pointer-events-none"></div>
+                )}
             </motion.div>
 
               {/* Navigation - Fixed height */}
-              <div className="flex justify-between items-center pt-3 border-t border-gray-200/50 w-full flex-shrink-0" style={{ minHeight: '60px' }}>
+              <div className="flex justify-between items-center pt-2 sm:pt-3 border-t border-gray-200/50 w-full flex-shrink-0" style={{ minHeight: '50px' }}>
               <motion.button
                   onClick={() => currentSlide > 0 && setCurrentSlide(currentSlide - 1)}
                 disabled={currentSlide === 0}
-                  className="flex items-center px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl text-sm"
+                  className="flex items-center px-2 sm:px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl text-xs sm:text-sm"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                   title="Previous Slide"
               >
-                  <ChevronLeft className="h-4 w-4 mr-1" />
-                  Previous
+                  <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                  <span className="hidden sm:inline">Previous</span>
+                  <span className="sm:hidden">Prev</span>
               </motion.button>
 
                 {/* Progress Bar */}
@@ -696,24 +739,26 @@ export default function PresentationViewer({ currentSlide, setCurrentSlide, onCo
               {currentSlide === slides.length - 1 ? (
                 <motion.button
                     onClick={onComplete}
-                    className="flex items-center px-3 py-2 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white rounded-full font-medium transition-all duration-300 shadow-lg hover:shadow-xl text-sm"
+                    className="flex items-center px-2 sm:px-3 py-2 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white rounded-full font-medium transition-all duration-300 shadow-lg hover:shadow-xl text-xs sm:text-sm"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                     title="Complete Presentation"
                 >
-                    <Check className="h-4 w-4 mr-1" />
-                    Complete
+                    <Check className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    <span className="hidden sm:inline">Complete</span>
+                    <span className="sm:hidden">Done</span>
                 </motion.button>
               ) : (
                 <motion.button
                     onClick={() => setCurrentSlide(currentSlide + 1)}
-                    className="flex items-center px-3 py-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-full font-medium transition-all duration-300 shadow-lg hover:shadow-xl text-sm"
+                    className="flex items-center px-2 sm:px-3 py-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-full font-medium transition-all duration-300 shadow-lg hover:shadow-xl text-xs sm:text-sm"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                     title="Next Slide"
                 >
-                    Next
-                    <ChevronRight className="h-4 w-4 ml-1" />
+                    <span className="hidden sm:inline">Next</span>
+                    <span className="sm:hidden">Next</span>
+                    <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 ml-1" />
                 </motion.button>
               )}
             </div>
@@ -727,6 +772,22 @@ export default function PresentationViewer({ currentSlide, setCurrentSlide, onCo
         @keyframes glow {
           0% { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 16px 2px rgba(167, 139, 250, 0.3); }
           100% { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35), 0 0 32px 4px rgba(167, 139, 250, 0.5); }
+        }
+        
+        /* Custom scrollbar styles */
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        
+        /* Smooth scrolling for mobile */
+        @media (max-width: 768px) {
+          .scrollbar-hide {
+            -webkit-overflow-scrolling: touch;
+          }
         }
       `}</style>
     </div>
