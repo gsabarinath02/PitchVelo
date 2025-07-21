@@ -77,12 +77,28 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # Add trusted host middleware
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.ALLOWED_HOSTS)
 
-# Configure CORS
+# Configure CORS with explicit origins
+cors_origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3001",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
+
+# Add any additional origins from settings
+cors_origins.extend(settings.cors_origins_list)
+
+# Remove duplicates and log the origins
+cors_origins = list(set(cors_origins))
+logger.info("CORS origins configured", origins=cors_origins)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins_list,
+    allow_origins=cors_origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
     expose_headers=["*"],
 )
@@ -99,6 +115,13 @@ async def add_process_time_header(request: Request, call_next):
     # Add request ID for tracing
     request_id = request.headers.get("X-Request-ID", str(time.time()))
     request.state.request_id = request_id
+    
+    # Log CORS preflight requests
+    if request.method == "OPTIONS":
+        logger.info("CORS preflight request", 
+                   origin=request.headers.get("origin"),
+                   method=request.method,
+                   headers=dict(request.headers))
     
     response = await call_next(request)
     
@@ -128,6 +151,7 @@ async def add_process_time_header(request: Request, call_next):
         request_id=request_id,
         user_agent=request.headers.get("user-agent"),
         client_ip=request.client.host if request.client else None,
+        origin=request.headers.get("origin"),
     )
     
     return response

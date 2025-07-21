@@ -4,10 +4,10 @@ import os
 
 class Settings(BaseSettings):
     # Database
-    DATABASE_URL: str
+    DATABASE_URL: str = "postgresql://postgres:password@postgres:5432/pitch_db"
     
     # Authentication
-    SECRET_KEY: str
+    SECRET_KEY: str = "your-secret-key-here"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
@@ -18,8 +18,8 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     LOG_LEVEL: str = "INFO"
     
-    # CORS
-    CORS_ORIGINS: str = "http://localhost:3000"
+    # CORS - More permissive for development
+    CORS_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001"
     
     # Monitoring
     SENTRY_DSN: Optional[str] = None
@@ -32,7 +32,18 @@ class Settings(BaseSettings):
     
     @property
     def cors_origins_list(self) -> List[str]:
-        return [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
+        origins = [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
+        # Add additional development origins
+        if self.ENVIRONMENT == "development":
+            origins.extend([
+                "http://localhost:3000",
+                "http://127.0.0.1:3000",
+                "http://localhost:3001",
+                "http://127.0.0.1:3001",
+                "http://localhost:8000",
+                "http://127.0.0.1:8000"
+            ])
+        return list(set(origins))  # Remove duplicates
     
     class Config:
         env_file = ".env"
