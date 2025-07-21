@@ -55,9 +55,25 @@ class LoginEventResponse(BaseModel):
     id: int
     user_id: int
     login_timestamp: datetime
+    session_duration_seconds: Optional[float] = None
     
     class Config:
         from_attributes = True
+
+class LogoutEventResponse(BaseModel):
+    id: int
+    user_id: int
+    logout_timestamp: datetime
+    login_event_id: Optional[int] = None
+    
+    class Config:
+        from_attributes = True
+
+class UserSessionData(BaseModel):
+    login_timestamp: datetime
+    logout_timestamp: Optional[datetime] = None
+    session_duration_seconds: Optional[float] = None
+    has_submitted_form: bool
 
 class PageVisitBase(BaseModel):
     page_name: str
@@ -83,8 +99,16 @@ class PageVisitResponse(PageVisitBase):
 class UserAnalytics(BaseModel):
     user: UserResponse
     login_events: List[LoginEventResponse]
+    logout_events: List[LogoutEventResponse]
     page_visits: List[PageVisitResponse]
     form_submissions: List[FormSubmissionResponse]
+
+class SimplifiedUserAnalytics(BaseModel):
+    user: UserResponse
+    sessions: List[UserSessionData]
+    total_time_spent_seconds: float
+    total_logins: int
+    has_submitted_form: bool
 
 class FormSubmissionWithUser(BaseModel):
     id: int

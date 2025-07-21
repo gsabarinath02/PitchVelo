@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User } from '@/lib/api';
+import { User, authAPI } from '@/lib/api';
 
 interface AuthContextType {
   user: User | null;
@@ -53,11 +53,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('user', JSON.stringify(newUser));
   };
 
-  const logout = () => {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+  const logout = async () => {
+    try {
+      // Track logout event before clearing data
+      if (token) {
+        await authAPI.logout();
+      }
+    } catch (error) {
+      console.error('Failed to track logout event:', error);
+    } finally {
+      // Clear auth data regardless of tracking success
+      setToken(null);
+      setUser(null);
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
   };
 
   return (

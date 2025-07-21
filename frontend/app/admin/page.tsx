@@ -56,30 +56,26 @@ export default function AdminPage() {
         
         const [usersResponse, analyticsResponse] = await Promise.all([
           usersAPI.getAll(),
-          analyticsAPI.getUserAnalytics(),
+          analyticsAPI.getSimplifiedAnalytics(),
         ]);
         
         setUsers(usersResponse.data);
         setAnalytics(analyticsResponse.data);
         
-        // Calculate stats
+        // Calculate stats from simplified analytics
         const totalUsers = usersResponse.data.length;
         const totalVisits = analyticsResponse.data.reduce((acc: number, user: any) => 
-          acc + (user.page_visits?.length || 0), 0);
+          acc + user.total_logins, 0);
         const totalSubmissions = analyticsResponse.data.reduce((acc: number, user: any) => 
-          acc + (user.form_submissions?.length || 0), 0);
-        const avgRating = analyticsResponse.data.reduce((acc: number, user: any) => {
-          const userRating = user.form_submissions?.reduce((sum: number, submission: any) => 
-            sum + (submission.rating || 0), 0) || 0;
-          const userCount = user.form_submissions?.length || 0;
-          return acc + (userCount > 0 ? userRating / userCount : 0);
-        }, 0) / (analyticsResponse.data.length || 1);
+          acc + (user.has_submitted_form ? 1 : 0), 0);
+        const totalTimeSpent = analyticsResponse.data.reduce((acc: number, user: any) => 
+          acc + user.total_time_spent_seconds, 0);
 
         setStats({
           totalUsers,
           totalVisits,
           totalSubmissions,
-          avgRating: Math.round(avgRating * 10) / 10
+          avgRating: totalUsers > 0 ? Math.round((totalSubmissions / totalUsers) * 5) : 0
         });
       } catch (error: any) {
         console.error('Failed to fetch admin data:', error);
@@ -192,7 +188,7 @@ export default function AdminPage() {
             color="border-l-blue-500"
           />
           <StatCard
-            title="Page Visits"
+            title="Total Logins"
             value={stats.totalVisits}
             icon={Eye}
             color="border-l-green-500"
@@ -204,8 +200,8 @@ export default function AdminPage() {
             color="border-l-purple-500"
           />
           <StatCard
-            title="Avg Rating"
-            value={`${stats.avgRating}/5`}
+            title="Submission Rate"
+            value={`${stats.totalUsers > 0 ? Math.round((stats.totalSubmissions / stats.totalUsers) * 100) : 0}%`}
             icon={TrendingUp}
             color="border-l-yellow-500"
           />
@@ -282,7 +278,7 @@ export default function AdminPage() {
                       <div className="flex items-center space-x-3">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                         <span className="text-sm text-green-700">
-                          {stats.totalVisits} page visits recorded
+                          {stats.totalVisits} total logins recorded
                         </span>
                       </div>
                       <div className="flex items-center space-x-3">
@@ -298,13 +294,15 @@ export default function AdminPage() {
                     <h3 className="text-lg font-semibold text-green-900 mb-2">Performance</h3>
                     <div className="space-y-3">
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-green-700">Average Rating</span>
-                        <span className="font-semibold text-green-900">{stats.avgRating}/5</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-green-700">Engagement Rate</span>
+                        <span className="text-sm text-green-700">Submission Rate</span>
                         <span className="font-semibold text-green-900">
                           {stats.totalUsers > 0 ? Math.round((stats.totalSubmissions / stats.totalUsers) * 100) : 0}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-green-700">Avg Logins per User</span>
+                        <span className="font-semibold text-green-900">
+                          {stats.totalUsers > 0 ? Math.round(stats.totalVisits / stats.totalUsers) : 0}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">

@@ -1,7 +1,8 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_BASE_URL = 'http://localhost:8000';
 
+// Create axios instance with default config
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -9,7 +10,7 @@ const api = axios.create({
   },
 });
 
-// Request interceptor to add auth token
+// Add request interceptor to include auth token
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -18,18 +19,64 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Response interceptor to handle errors
+// Add response interceptor for error handling
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
       window.location.href = '/login';
     }
     return Promise.reject(error);
   }
 );
 
+// Auth API
+export const authAPI = {
+  login: (data: { email: string; password: string }) =>
+    api.post('/auth/auth/login', data),
+  
+  signup: (data: { email: string; username: string; password: string }) =>
+    api.post('/auth/auth/signup', data),
+  
+  getMe: () => api.get('/auth/auth/me'),
+  
+  logout: () => api.post('/analytics/analytics/logout'),
+};
+
+// Users API
+export const usersAPI = {
+  getAll: () => api.get('/users/users/'),
+  getById: (id: number) => api.get(`/users/users/${id}`),
+  create: (data: any) => api.post('/users/users/', data),
+  update: (id: number, data: any) => api.put(`/users/users/${id}`, data),
+  delete: (id: number) => api.delete(`/users/users/${id}`),
+};
+
+// Forms API
+export const formsAPI = {
+  submit: (data: any) => api.post('/forms/forms/submit', data),
+  getSubmissions: () => api.get('/forms/forms/submissions'),
+  getSubmissionById: (id: number) => api.get(`/forms/forms/submissions/${id}`),
+};
+
+// Analytics API
+export const analyticsAPI = {
+  createPageVisit: (data: { page_name: string }) =>
+    api.post('/analytics/analytics/page-visit', data),
+  
+  updatePageVisit: (visitId: number, data: { exit_time: string; duration_seconds: number }) =>
+    api.put(`/analytics/analytics/page-visit/${visitId}`, data),
+  
+  getUserAnalytics: () => api.get('/analytics/analytics/user-analytics'),
+  
+  getSimplifiedAnalytics: () => api.get('/analytics/analytics/simplified-analytics'),
+  
+  getMyAnalytics: () => api.get('/analytics/analytics/my-analytics'),
+};
+
+// Types
 export interface User {
   id: number;
   email: string;
@@ -38,17 +85,9 @@ export interface User {
   created_at: string;
 }
 
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface TokenResponse {
-  access_token: string;
-  token_type: string;
-}
-
 export interface FormSubmission {
+  id: number;
+  user_id: number;
   feedback: string;
   rating: number;
   suggestions?: string;
@@ -57,46 +96,20 @@ export interface FormSubmission {
   contact_email?: string;
   contact_phone?: string;
   contact_notes?: string;
+  submitted_at: string;
 }
 
-export interface PageVisit {
-  page_name: string;
+export interface UserSessionData {
+  login_timestamp: string;
+  logout_timestamp?: string;
+  session_duration_seconds?: number;
+  has_submitted_form: boolean;
 }
 
-export interface PageVisitUpdate {
-  exit_time: string;
-  duration_seconds: number;
-}
-
-// Auth API - Fixed endpoints to match backend routes
-export const authAPI = {
-  login: (data: LoginRequest) => api.post<TokenResponse>('/auth/auth/login', data),
-  signup: (data: LoginRequest & { username: string; role?: string }) => 
-    api.post<User>('/auth/auth/signup', data),
-  getMe: () => api.get<User>('/auth/auth/me'),
-};
-
-// Users API - Fixed endpoints to match backend routes
-export const usersAPI = {
-  getAll: () => api.get<User[]>('/users/users/'),
-  create: (data: LoginRequest & { username: string; role?: string }) => 
-    api.post<User>('/users/users/', data),
-};
-
-// Forms API - Fixed endpoints to match backend routes
-export const formsAPI = {
-  submit: (data: FormSubmission) => api.post('/forms/forms/submit', data),
-  getSubmissions: () => api.get('/forms/forms/submissions'),
-  getMySubmission: () => api.get('/forms/forms/my-submission'),
-};
-
-// Analytics API - Fixed endpoints to match backend routes
-export const analyticsAPI = {
-  createPageVisit: (data: PageVisit) => api.post('/analytics/analytics/page-visit', data),
-  updatePageVisit: (visitId: number, data: PageVisitUpdate) => 
-    api.put(`/analytics/analytics/page-visit/${visitId}`, data),
-  getUserAnalytics: () => api.get('/analytics/analytics/user-analytics'),
-  getMyAnalytics: () => api.get('/analytics/analytics/my-analytics'),
-};
-
-export default api; 
+export interface SimplifiedUserAnalytics {
+  user: User;
+  sessions: UserSessionData[];
+  total_time_spent_seconds: number;
+  total_logins: number;
+  has_submitted_form: boolean;
+} 

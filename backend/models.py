@@ -15,6 +15,7 @@ class User(Base):
     
     # Relationships
     login_events = relationship("LoginEvent", back_populates="user")
+    logout_events = relationship("LogoutEvent", back_populates="user")
     page_visits = relationship("PageVisit", back_populates="user")
     form_submissions = relationship("FormSubmission", back_populates="user")
 
@@ -24,9 +25,21 @@ class LoginEvent(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     login_timestamp = Column(DateTime(timezone=True), server_default=func.now())
+    session_duration_seconds = Column(Float, nullable=True)  # Duration until logout
     
     # Relationships
     user = relationship("User", back_populates="login_events")
+
+class LogoutEvent(Base):
+    __tablename__ = "logout_events"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    logout_timestamp = Column(DateTime(timezone=True), server_default=func.now())
+    login_event_id = Column(Integer, ForeignKey("login_events.id"), nullable=True)
+    
+    # Relationships
+    user = relationship("User", back_populates="logout_events")
 
 class PageVisit(Base):
     __tablename__ = "page_visits"
