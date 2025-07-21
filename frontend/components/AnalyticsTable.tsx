@@ -1,7 +1,8 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Clock, Eye, FileText, User } from 'lucide-react';
+import { Clock, Eye, FileText, User, AlertCircle } from 'lucide-react';
 
 interface AnalyticsData {
   user: {
@@ -38,6 +39,15 @@ interface AnalyticsTableProps {
 }
 
 export default function AnalyticsTable({ analytics }: AnalyticsTableProps) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (analytics && analytics.length > 0) {
+      setIsLoading(false);
+    }
+  }, [analytics]);
+
   const formatDuration = (seconds?: number) => {
     if (!seconds) return 'N/A';
     const minutes = Math.floor(seconds / 60);
@@ -49,16 +59,50 @@ export default function AnalyticsTable({ analytics }: AnalyticsTableProps) {
     return visits.reduce((total, visit) => total + (visit.duration_seconds || 0), 0);
   };
 
+  // Limit the number of page visits to prevent performance issues
+  const getLimitedPageVisits = (visits: any[], limit: number = 50) => {
+    return visits.slice(-limit); // Get the most recent visits
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+        <span className="ml-2 text-gray-600">Loading analytics...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="text-center">
+          <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
+          <p className="text-red-600">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!analytics || analytics.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-gray-500">No analytics data available.</p>
+      </div>
+    );
+  }
+
   return (
     <div>
       <h2 className="text-2xl font-bold text-gray-900 mb-6">User Analytics</h2>
       
       <div className="space-y-6">
-        {analytics.map((data) => (
+        {analytics.map((data, index) => (
           <motion.div
             key={data.user.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
             className="card"
           >
             <div className="flex items-center justify-between mb-4">
@@ -132,10 +176,17 @@ export default function AnalyticsTable({ analytics }: AnalyticsTableProps) {
               </div>
             </div>
 
-            {/* Detailed Page Visits */}
+            {/* Detailed Page Visits - Limited to prevent performance issues */}
             {data.page_visits.length > 0 && (
               <div className="mt-6">
-                <h4 className="font-semibold text-gray-900 mb-3">Page Visit Details</h4>
+                <h4 className="font-semibold text-gray-900 mb-3">
+                  Page Visit Details 
+                  {data.page_visits.length > 50 && (
+                    <span className="text-sm text-gray-500 ml-2">
+                      (Showing last 50 visits)
+                    </span>
+                  )}
+                </h4>
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
@@ -152,7 +203,7 @@ export default function AnalyticsTable({ analytics }: AnalyticsTableProps) {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {data.page_visits.map((visit) => (
+                      {getLimitedPageVisits(data.page_visits).map((visit) => (
                         <tr key={visit.id} className="hover:bg-gray-50">
                           <td className="px-4 py-2 text-sm text-gray-900">
                             {visit.page_name}

@@ -19,7 +19,8 @@ import {
   Calendar,
   Clock,
   FileText,
-  Play
+  Play,
+  AlertCircle
 } from 'lucide-react';
 
 export default function AdminPage() {
@@ -29,6 +30,7 @@ export default function AdminPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [analytics, setAnalytics] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalVisits: 0,
@@ -49,6 +51,9 @@ export default function AdminPage() {
 
     const fetchData = async () => {
       try {
+        setIsLoading(true);
+        setError(null);
+        
         const [usersResponse, analyticsResponse] = await Promise.all([
           usersAPI.getAll(),
           analyticsAPI.getUserAnalytics(),
@@ -76,8 +81,9 @@ export default function AdminPage() {
           totalSubmissions,
           avgRating: Math.round(avgRating * 10) / 10
         });
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to fetch admin data:', error);
+        setError(error.response?.data?.detail || 'Failed to load admin data');
       } finally {
         setIsLoading(false);
       }
@@ -96,6 +102,24 @@ export default function AdminPage() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading admin dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen gradient-bg flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Dashboard</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="btn-primary"
+          >
+            Retry
+          </button>
         </div>
       </div>
     );
