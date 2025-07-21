@@ -2,14 +2,12 @@
 const nextConfig = {
   output: 'standalone',
   experimental: {
-    appDir: true,
+    // Remove appDir as it's now default in Next.js 14
   },
   images: {
     domains: ['localhost'],
   },
-  env: {
-    CUSTOM_KEY: process.env.CUSTOM_KEY,
-  },
+  // Remove env configuration that's causing warnings
 }
 
 module.exports = nextConfig 

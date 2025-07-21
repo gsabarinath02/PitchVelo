@@ -15,6 +15,7 @@ from database import engine
 from models import Base
 from routes import auth, users, forms, analytics
 from config import settings
+from sqlalchemy import text
 
 # Initialize Sentry if DSN is provided
 if settings.SENTRY_DSN:
@@ -144,7 +145,8 @@ async def health_check():
     
     # Check database
     try:
-        engine.execute("SELECT 1")
+        with engine.connect() as connection:
+            connection.execute(text("SELECT 1")).fetchone()
         health_status["database"] = "healthy"
     except Exception as e:
         health_status["database"] = "unhealthy"
