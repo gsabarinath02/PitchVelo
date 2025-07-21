@@ -1,270 +1,306 @@
-# Quick Start: Production Deployment
-## Presentation Analytics Platform
+# 🚀 Quick Start: Production Deployment
 
-**Time to Deploy**: ~15 minutes  
-**Difficulty**: Easy  
-**Status**: ✅ Ready to Deploy
+## 📋 Overview
+This guide will get your Pitch Analytics application running in production in under 30 minutes.
+
+## 🎯 Recommended: Railway (Easiest)
+
+### Step 1: Prepare Your Repository
+```bash
+# Make sure your code is pushed to GitHub
+git add .
+git commit -m "Production ready"
+git push origin master
+```
+
+### Step 2: Deploy to Railway
+1. Go to [railway.app](https://railway.app)
+2. Sign up with your GitHub account
+3. Click "New Project" → "Deploy from GitHub repo"
+4. Select your repository
+5. Railway will automatically detect your Docker setup
+
+### Step 3: Configure Environment Variables
+In Railway dashboard, add these environment variables:
+
+```bash
+# Database (Railway will provide this automatically)
+DATABASE_URL=postgresql://postgres:password@postgres:5432/presentation_app
+
+# Security (Generate these)
+SECRET_KEY=your-super-secret-key-minimum-32-characters
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+# Frontend
+NEXT_PUBLIC_API_URL=https://your-backend-url.railway.app
+
+# Optional: Monitoring
+SENTRY_DSN=your-sentry-dsn
+```
+
+### Step 4: Deploy
+- Railway will automatically build and deploy your application
+- You'll get URLs for both frontend and backend
+- Your app will be live in minutes!
 
 ---
 
-## 🚀 5-Minute Setup
+## 🌐 Alternative: Render (Free Tier)
 
-### Step 1: Environment Setup
+### Step 1: Deploy Backend
+1. Go to [render.com](https://render.com)
+2. Sign up and connect GitHub
+3. Click "New" → "Web Service"
+4. Connect your repository
+5. Configure:
+   - **Name**: `pitch-backend`
+   - **Root Directory**: `backend`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `gunicorn main:app -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT`
+
+### Step 2: Deploy Frontend
+1. Click "New" → "Static Site"
+2. Configure:
+   - **Name**: `pitch-frontend`
+   - **Root Directory**: `frontend`
+   - **Build Command**: `npm install && npm run build`
+   - **Publish Directory**: `out`
+
+### Step 3: Add Database
+1. Click "New" → "PostgreSQL"
+2. Create database
+3. Update environment variables
+
+---
+
+## 🐳 Self-Hosted (Advanced)
+
+### Prerequisites
+- Server with Docker installed
+- Domain name (optional)
+- SSL certificates (optional)
+
+### Step 1: Setup Server
 ```bash
-# Clone and setup
-git clone <repository-url>
-cd Pitch
+# Clone repository
+git clone https://github.com/your-username/PitchVelo.git
+cd PitchVelo
 
 # Copy environment file
 cp env.production.example .env
 
-# Edit environment variables (IMPORTANT!)
+# Edit environment variables
 nano .env
 ```
 
-### Step 2: Configure Environment Variables
-Edit `.env` file with your production values:
+### Step 2: Configure Environment
+Edit `.env` file:
+```bash
+# Database
+POSTGRES_PASSWORD=your-secure-password
+DATABASE_URL=postgresql://postgres:your-secure-password@postgres:5432/presentation_app
 
-```env
-# REQUIRED: Change these values
-POSTGRES_PASSWORD=your-super-secure-password-here
-SECRET_KEY=your-32-character-secret-key-here
-CORS_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
+# Security
+SECRET_KEY=your-32-character-secret-key
+REDIS_PASSWORD=your-redis-password
+
+# Frontend
 NEXT_PUBLIC_API_URL=https://yourdomain.com/api
-ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
 
-# OPTIONAL: For SSL certificates
-SSL_CERT_PATH=/etc/nginx/ssl/cert.pem
-SSL_KEY_PATH=/etc/nginx/ssl/key.pem
+# CORS
+CORS_ORIGINS=https://yourdomain.com
 ```
 
-### Step 3: Deploy to Production
+### Step 3: Deploy
 ```bash
-# Deploy with one command
+# Make script executable
+chmod +x scripts/deploy.sh
+
+# Deploy to production
 ./scripts/deploy.sh deploy
 
-# Check deployment status
-./scripts/monitor.sh single
-```
+# Check status
+./scripts/deploy.sh status
 
-### Step 4: Access Your Application
-- **Frontend**: https://yourdomain.com
-- **Backend API**: https://yourdomain.com/api
-- **Health Check**: https://yourdomain.com/health
-- **API Docs**: https://yourdomain.com/docs
-
----
-
-## 🔧 Advanced Setup (Optional)
-
-### SSL Certificates
-```bash
-# Create SSL directory
-mkdir -p nginx/ssl
-
-# Copy your certificates
-cp your-cert.pem nginx/ssl/cert.pem
-cp your-key.pem nginx/ssl/key.pem
-
-# Set permissions
-chmod 600 nginx/ssl/key.pem
-chmod 644 nginx/ssl/cert.pem
-```
-
-### Custom Domain
-```bash
-# Update your DNS to point to your server
-# A record: yourdomain.com → your-server-ip
-# A record: www.yourdomain.com → your-server-ip
-```
-
-### Firewall Setup
-```bash
-# Allow necessary ports
-sudo ufw allow 80/tcp
-sudo ufw allow 443/tcp
-sudo ufw allow 22/tcp
-sudo ufw enable
+# Monitor
+./scripts/deploy.sh monitor
 ```
 
 ---
 
-## 📊 Monitoring Your Application
+## 🔧 Environment Variables Reference
+
+### Required Variables
+```bash
+# Database
+DATABASE_URL=postgresql://user:password@host:port/database
+POSTGRES_PASSWORD=your-secure-password
+
+# Security
+SECRET_KEY=your-32-character-secret-key
+REDIS_PASSWORD=your-redis-password
+
+# Frontend
+NEXT_PUBLIC_API_URL=https://your-backend-url.com
+```
+
+### Optional Variables
+```bash
+# Application
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+LOG_LEVEL=INFO
+
+# CORS
+CORS_ORIGINS=https://yourdomain.com
+
+# Monitoring
+SENTRY_DSN=your-sentry-dsn
+```
+
+---
+
+## 🚀 Deployment Commands
+
+### Railway/Render (Automatic)
+- Deployment happens automatically on git push
+- No manual commands needed
+
+### Self-Hosted
+```bash
+# Deploy
+./scripts/deploy.sh deploy
+
+# Check health
+./scripts/deploy.sh health
+
+# View logs
+./scripts/deploy.sh logs
+
+# Monitor
+./scripts/deploy.sh monitor
+
+# Backup
+./scripts/deploy.sh backup
+
+# Rollback
+./scripts/deploy.sh rollback
+```
+
+---
+
+## 🔍 Troubleshooting
+
+### Common Issues
+
+1. **Database Connection Failed**
+   ```bash
+   # Check if database is running
+   docker-compose -f docker-compose.prod.yml ps
+   
+   # Check logs
+   ./scripts/deploy.sh logs postgres
+   ```
+
+2. **Frontend Not Loading**
+   ```bash
+   # Check frontend logs
+   ./scripts/deploy.sh logs frontend
+   
+   # Verify API URL
+   echo $NEXT_PUBLIC_API_URL
+   ```
+
+3. **Backend Errors**
+   ```bash
+   # Check backend logs
+   ./scripts/deploy.sh logs backend
+   
+   # Run health check
+   curl http://localhost:8000/health
+   ```
 
 ### Health Checks
 ```bash
-# Check application health
-curl https://yourdomain.com/health
+# Application health
+curl http://localhost:8000/health
+
+# Frontend
+curl http://localhost:3000
+
+# Database
+docker-compose -f docker-compose.prod.yml exec postgres pg_isready
+```
+
+---
+
+## 📊 Monitoring
+
+### Basic Monitoring
+```bash
+# Check service status
+./scripts/deploy.sh status
 
 # Monitor continuously
-./scripts/monitor.sh continuous
+./scripts/deploy.sh monitor
 
-# Check resource usage
+# View resource usage
 docker stats
 ```
 
-### Logs
-```bash
-# View all logs
-docker-compose -f docker-compose.prod.yml logs -f
-
-# View specific service logs
-docker-compose -f docker-compose.prod.yml logs -f backend
-docker-compose -f docker-compose.prod.yml logs -f frontend
-```
+### Advanced Monitoring
+- Set up Sentry for error tracking
+- Configure uptime monitoring
+- Set up log aggregation
+- Monitor database performance
 
 ---
 
 ## 🔒 Security Checklist
 
-### ✅ Required Security Steps
-- [ ] Changed default database password
-- [ ] Generated strong SECRET_KEY (32+ characters)
-- [ ] Configured CORS for your domain
-- [ ] Set up SSL certificates
-- [ ] Configured firewall rules
-
-### ✅ Optional Security Enhancements
-- [ ] Set up monitoring alerts
-- [ ] Configure automated backups
-- [ ] Enable rate limiting
-- [ ] Set up security scanning
-
----
-
-## 🛠️ Common Operations
-
-### Start/Stop Services
-```bash
-# Start all services
-docker-compose -f docker-compose.prod.yml up -d
-
-# Stop all services
-docker-compose -f docker-compose.prod.yml down
-
-# Restart specific service
-docker-compose -f docker-compose.prod.yml restart backend
-```
-
-### Backup & Recovery
-```bash
-# Create backup
-./scripts/deploy.sh backup
-
-# Restore from backup
-docker-compose -f docker-compose.prod.yml exec -T postgres psql -U postgres presentation_app < backup_file.sql
-```
-
-### Updates
-```bash
-# Update application
-git pull origin main
-./scripts/deploy.sh deploy
-
-# Update dependencies
-docker-compose -f docker-compose.prod.yml build --no-cache
-./scripts/deploy.sh deploy
-```
-
----
-
-## 🚨 Troubleshooting
-
-### Application Won't Start
-```bash
-# Check logs
-docker-compose -f docker-compose.prod.yml logs
-
-# Check environment
-docker-compose -f docker-compose.prod.yml config
-
-# Restart services
-docker-compose -f docker-compose.prod.yml down
-docker-compose -f docker-compose.prod.yml up -d
-```
-
-### Database Issues
-```bash
-# Check database status
-docker-compose -f docker-compose.prod.yml exec postgres pg_isready
-
-# Reset database (WARNING: loses data)
-docker-compose -f docker-compose.prod.yml exec backend python init_db.py
-```
-
-### SSL Issues
-```bash
-# Check certificate
-openssl x509 -in nginx/ssl/cert.pem -text -noout
-
-# Test SSL
-curl -I https://yourdomain.com
-```
-
----
-
-## 📞 Support
-
-### Quick Help
-- **Documentation**: [Production Deployment Guide](PRODUCTION_DEPLOYMENT_GUIDE.md)
-- **API Docs**: https://yourdomain.com/docs
-- **Health Check**: https://yourdomain.com/health
-
-### Emergency Commands
-```bash
-# Emergency restart
-docker-compose -f docker-compose.prod.yml down && docker-compose -f docker-compose.prod.yml up -d
-
-# Check all services
-docker-compose -f docker-compose.prod.yml ps
-
-# View recent logs
-docker-compose -f docker-compose.prod.yml logs --tail=100
-```
-
----
-
-## ✅ Success Checklist
-
-### After Deployment
-- [ ] Application accessible at https://yourdomain.com
-- [ ] Health check returns "healthy"
-- [ ] API documentation accessible
-- [ ] Database connection working
-- [ ] SSL certificate valid
-- [ ] Monitoring script running
-- [ ] Backup system working
-
-### Performance Check
-- [ ] Page load time < 3 seconds
-- [ ] API response time < 500ms
-- [ ] No errors in logs
-- [ ] Resource usage reasonable
+- [ ] Strong passwords generated
+- [ ] SECRET_KEY is 32+ characters
+- [ ] HTTPS enabled (Railway/Render do this automatically)
+- [ ] CORS configured properly
+- [ ] Database access restricted
+- [ ] Regular backups enabled
+- [ ] Monitoring set up
 
 ---
 
 ## 🎯 Next Steps
 
-### Immediate (Day 1)
-1. ✅ Deploy application
-2. ✅ Test all features
-3. ✅ Set up monitoring
-4. ✅ Configure backups
-
-### Short-term (Week 1)
-1. 🔄 Set up alerting
-2. 🔄 Performance testing
-3. 🔄 Security audit
-4. 🔄 Team training
-
-### Long-term (Month 1)
-1. 🔄 Load testing
-2. 🔄 Advanced monitoring
-3. 🔄 CI/CD pipeline
-4. 🔄 Multi-region deployment
+1. **Custom Domain**: Configure your domain name
+2. **SSL Certificate**: Enable HTTPS (automatic on Railway/Render)
+3. **Monitoring**: Set up Sentry and uptime monitoring
+4. **Backups**: Configure automated backups
+5. **Scaling**: Plan for traffic growth
 
 ---
 
-**🎉 Congratulations!** Your application is now production-ready and deployed.
+## 📞 Support
 
-**Need help?** Check the [Production Deployment Guide](PRODUCTION_DEPLOYMENT_GUIDE.md) for detailed instructions. 
+- **Documentation**: Check the main README.md
+- **Issues**: Create GitHub issues
+- **Railway Support**: [railway.app/support](https://railway.app/support)
+- **Render Support**: [render.com/docs](https://render.com/docs)
+
+---
+
+## ⚡ Quick Commands Reference
+
+```bash
+# Railway/Render (Automatic)
+git push origin master  # Triggers deployment
+
+# Self-Hosted
+./scripts/deploy.sh deploy     # Deploy
+./scripts/deploy.sh health     # Health check
+./scripts/deploy.sh logs       # View logs
+./scripts/deploy.sh backup     # Create backup
+./scripts/deploy.sh rollback   # Rollback
+./scripts/deploy.sh monitor    # Monitor
+```
+
+**Your application will be live in minutes!** 🚀 
