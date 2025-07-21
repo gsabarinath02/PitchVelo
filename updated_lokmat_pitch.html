@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veloscope & EventForce - Maha Marathon Partnership</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .slide {
+            min-height: 100vh;
+            display: none;
+            padding: 2rem;
+            position: relative;
+            background: white;
+            margin: 1rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .slide.active {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 3rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .logo-container {
+            text-align: center;
+        }
+
+        .eventforce-logo {
+            width: 180px;
+            height: 60px;
+            transition: transform 0.3s ease;
+        }
+
+        .eventforce-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .eventforce-logo:hover {
+            transform: scale(1.1);
+        }
+
+        .veloscope-logo {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .veloscope-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .veloscope-logo:hover {
+            transform: scale(1.1);
+        }
+
+        .veloscope-inner {
+            display: none;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #FF6B35, #F7931E);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .feature-desc {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .pricing-table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin: 2rem 0;
+        }
+
+        .pricing-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .pricing-content {
+            padding: 2rem;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .price-highlight {
+            background: linear-gradient(45deg, #FF6B35, #F7931E);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: linear-gradient(45deg, #FF6B35, #F7931E);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: fixed; /* Changed from absolute to fixed for better consistency */
+            bottom: 20px;
+            z-index: 100; /* increased to ensure it's above all content */
+        }
+
+        #prevBtn {
+            left: 20px;
+        }
+
+        #nextBtn {
+            right: 20px;
+        }
+
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(247, 147, 30, 0.4);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+
+        .cta-section {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+        }
+
+        .cta-button {
+            background: linear-gradient(45deg, #FF6B35, #F7931E);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(247, 147, 30, 0.4);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 15px;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .brand-eventforce {
+            color: #FF6B35;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .brand-veloscope {
+            color: #8BC34A;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .plus-sign {
+            font-size: 2rem;
+            color: #ccc;
+            margin: 0 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                margin: 0.5rem;
+                padding: 1rem;
+            }
+
+            .title {
+                font-size: 2rem;
+            }
+
+            .logo-section {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .plus-sign {
+                display: inline-block; /* ✅ Force it to show on mobile */
+                font-size: 2rem;
+                color: #ccc;
+                margin: 0 1rem;
+            }
+
+            .navigation {
+                bottom: 1rem;
+                right: 1rem;
+            }
+
+            .nav-btn {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.9rem;
+                bottom: 20px;            /* ⬅️ Make sure this is here */
+                position: fixed;         /* ⬅️ Important for consistent placement */
+                z-index: 1000;           /* ⬅️ Helps with iPhone issue */
+                pointer-events: auto;    /* ⬅️ Ensures it's clickable */
+            }
+
+            #prevBtn {
+                left: 20px;
+                right: auto;
+                bottom: 20px;
+            }
+
+            #nextBtn {
+                right: 20px;
+                left: auto;
+                bottom: 20px;
+            }
+
+        }
+
+
+        .contact-form-container {
+          max-width: 600px;
+          margin: 2rem auto;
+          background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+          padding: 2rem;
+          border-radius: 15px;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .contact-form-container h3 {
+          color: #2c3e50;
+          margin-bottom: 1rem;
+        }
+
+        .contact-form-container label {
+          display: block;
+          margin-bottom: 1rem;
+          font-weight: bold;
+          color: #2c3e50;
+        }
+
+        .contact-form-container input,
+        .contact-form-container textarea {
+          width: 100%;
+          padding: 0.8rem;
+          border: 1px solid #ccc;
+          border-radius: 8px;
+          margin-top: 0.5rem;
+        }
+
+        .contact-form-container button {
+          background: linear-gradient(45deg, #28a745, #218838);
+          color: white;
+          padding: 0.8rem 1.5rem;
+          border: none;
+          border-radius: 25px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .contact-form-container button:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        #selectedOptionsSummary {
+          background: white;
+          padding: 1rem 1.5rem;
+          border-radius: 10px;
+          margin-bottom: 2rem;
+          box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        #selectedOptionsSummary h3 {
+          margin-bottom: 0.5rem;
+          color: #2c3e50;
+        }
+
+        #selectedOptionsList {
+          margin-left: 1.5rem;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="slide-counter">
+        <span id="currentSlide">1</span> / <span id="totalSlides">6</span>
+    </div>
+
+    <!-- Slide 1: Welcome -->
+    <div class="slide active">
+        <div class="slide-header">
+            <div class="logo-section">
+                <div class="logo-container">
+                    <div class="eventforce-logo">
+                        <img src="https://veloimages.s3.ap-south-1.amazonaws.com/Mangaluru%20Beach%20Festival%202025/proposal_logos/eventforce_logocolor.png" alt="EventForce Logo">
+                    </div>
+                    <div class="brand-eventforce">Technology Platform</div>
+                </div>
+                <div class="plus-sign">+</div>
+                <div class="logo-container">
+                    <div class="veloscope-logo">
+                        <img src="https://veloimages.s3.ap-south-1.amazonaws.com/Mangaluru%20Beach%20Festival%202025/proposal_logos/Veloscope_Logo%201.png" alt="Veloscope Logo">
+                    </div>
+                    <div style="font-weight: bold; color: #2c3e50;">veloscope</div>
+                    <div class="brand-veloscope">Creative Solutions</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="title">Transforming Maha Marathon Experience</div>
+        <div class="subtitle">Complete Digital Event Management & Marketing Solution</div>
+        
+        <div class="content-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🏃‍♂️</div>
+                <div class="feature-title">Current Partnership</div>
+                <div class="feature-desc">Successfully managing photography and videography for Maha Marathon series across Maharashtra</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🚀</div>
+                <div class="feature-title">Next Evolution</div>
+                <div class="feature-desc">Introducing comprehensive event management platform with AI-powered solutions</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-title">Complete Solution</div>
+                <div class="feature-desc">From registration to post-event engagement - all in one integrated platform</div>
+            </div>
+        </div>
+        
+        <div class="cta-section">
+            <h3>Ready to revolutionize your event management?</h3>
+            <p>Let's take Maha Marathon to the next level with cutting-edge technology and creative excellence</p>
+        </div>
+    </div>
+
+    <!-- Slide 2: EventForce Platform -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="logo-section">
+                <div class="eventforce-logo">
+                    <img src="https://veloimages.s3.ap-south-1.amazonaws.com/Mangaluru%20Beach%20Festival%202025/proposal_logos/eventforce_logocolor.png" alt="EventForce Logo">
+                </div>
+            </div>
+            <div class="title">EventForce Platform</div>
+            <div class="subtitle">Complete Digital Backbone for Event Management</div>
+        </div>
+        
+        <div class="content-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📋</div>
+                <div class="feature-title">Smart Registration System</div>
+                <div class="feature-desc">Seamless participant registration with payment gateway integration. Only ₹10 per participant for EventForce subscribers vs ₹25 for regular users</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <div class="feature-title">AI-Powered Support Desk</div>
+                <div class="feature-desc">24/7 automated customer support with intelligent query resolution and escalation to human agents when needed</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">💬</div>
+                <div class="feature-title">Omni-Channel Messaging</div>
+                <div class="feature-desc">Unified console for WhatsApp, SMS, Email, Facebook, Instagram with hyper-personalized messaging and campaign tracking</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <div class="feature-title">Customer Data Platform</div>
+                <div class="feature-desc">Advanced CRM with participant history, performance analytics, and pre-built query filters for targeted engagement</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">☁️</div>
+                <div class="feature-title">Secure Cloud Storage</div>
+                <div class="feature-desc">3TB storage for all event data with easy access, classification, and retrieval through a unified interface</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📈</div>
+                <div class="feature-title">Real-time Dashboards</div>
+                <div class="feature-desc">Event-specific status dashboards with role-based access for efficient task management and decision making</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: Veloscope Creative Solutions -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="logo-section">
+                <div class="logo-container">
+                    <div class="veloscope-logo">
+                        <img src="https://veloimages.s3.ap-south-1.amazonaws.com/Mangaluru%20Beach%20Festival%202025/proposal_logos/Veloscope_Logo%201.png" alt="Veloscope Logo">
+                    </div>
+                    <div style="font-weight: bold; color: #2c3e50; margin-top: 10px;">veloscope</div>
+                </div>
+            </div>
+            <div class="title">Veloscope Creative Solutions</div>
+            <div class="subtitle">Strategic Marketing & Brand Amplification</div>
+        </div>
+        
+        <div class="content-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <div class="feature-title">Social Media Strategy</div>
+                <div class="feature-desc">Comprehensive social media calendar, content creation, and strategic posting (3 posts/week per event)</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📸</div>
+                <div class="feature-title">Photography & Video</div>
+                <div class="feature-desc">Continued excellence in event photography with advanced face and BIB tagging at ₹1.25 per image (vs ₹2.50 regular)</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-title">Campaign Management</div>
+                <div class="feature-desc">Pre and post-event content-driven campaigns with organic and paid promotion strategies</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <div class="feature-title">Content Creation</div>
+                <div class="feature-desc">Engaging visual content, reels, and promotional materials designed specifically for marathon events</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <div class="feature-title">Analytics & Tracking</div>
+                <div class="feature-desc">Detailed performance analytics and ROI tracking for all marketing initiatives</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🎬</div>
+                <div class="feature-title">Production Support</div>
+                <div class="feature-desc">Optional production crew deployment for special shoots and promotional videos at pre-agreed rates</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: Pricing & Investment -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="title">Investment & Pricing</div>
+            <div class="subtitle">Exclusive Lokmat Partnership Pricing</div>
+        </div>
+        
+        <div class="pricing-table">
+            <div class="pricing-header">
+                <h2>EventForce Platform - Special Lokmat Pricing</h2>
+            </div>
+            <div class="pricing-content">
+                <div class="price-row">
+                    <span><strong>Platform Subscription (6 events)</strong></span>
+                    <span class="price-highlight">₹3,00,000/year</span>
+                </div>
+                <div class="price-row">
+                    <span>Regular Subscription Cost</span>
+                    <span style="text-decoration: line-through; color: #999;">₹4,50,000/year</span>
+                </div>
+                <div class="price-row">
+                    <span><strong>Your Savings</strong></span>
+                    <span style="color: #27ae60; font-weight: bold;">₹1,50,000/year</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">3TB</div>
+                <div>Cloud Storage</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">18,000</div>
+                <div>Message Credits/Year</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">₹1.20</div>
+                <div>Per Additional Message</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">₹1.25</div>
+                <div>Per Image Tagging</div>
+            </div>
+        </div>
+        
+        <div class="pricing-table">
+            <div class="pricing-header">
+                <h2>Veloscope Social Media Services</h2>
+            </div>
+            <div class="pricing-content">
+                <div class="price-row">
+                    <span><strong>All 6 Events (Annual)</strong></span>
+                    <span class="price-highlight">₹1,00,000+GST/month</span>
+                </div>
+                <div class="price-row">
+                    <span>Individual Event</span>
+                    <span>₹25,000+GST/month</span>
+                </div>
+                <div class="price-row">
+                    <span>Short-term (3 months)</span>
+                    <span>₹30,000+GST/month</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Value Proposition -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="title">Why Choose This Partnership?</div>
+            <div class="subtitle">Transforming Events, Amplifying Success</div>
+        </div>
+        
+        <div class="content-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🏆</div>
+                <div class="feature-title">Proven Track Record</div>
+                <div class="feature-desc">Years of successful partnership in photography and videography for Maha Marathon series</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">💰</div>
+                <div class="feature-title">Significant Cost Savings</div>
+                <div class="feature-desc">33% discount on platform subscription + preferential pricing on all services</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🔧</div>
+                <div class="feature-title">End-to-End Solution</div>
+                <div class="feature-desc">Single point of contact for all technology and creative needs</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📈</div>
+                <div class="feature-title">Data-Driven Growth</div>
+                <div class="feature-desc">Enhanced participant engagement and retention through smart CRM and analytics</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-title">Operational Efficiency</div>
+                <div class="feature-desc">Streamlined processes reducing manual work and increasing productivity</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-title">Brand Amplification</div>
+                <div class="feature-desc">Strategic marketing approach to enhance Maha Marathon's reach and impact</div>
+            </div>
+        </div>
+        
+        <div class="cta-section">
+            <h3>Ready to Transform Your Event Experience?</h3>
+            <p>Join hundreds of successful events powered by EventForce and Veloscope</p>
+        </div>
+    </div>
+
+    <!-- Slide 6: Call to Action -->
+    <div class="slide">
+      <div class="slide-header">
+        <div class="logo-section">
+          <div class="eventforce-logo">
+            <img src="https://veloimages.s3.ap-south-1.amazonaws.com/Mangaluru%20Beach%20Festival%202025/proposal_logos/eventforce_logocolor.png" alt="EventForce Logo">
+          </div>
+          <div class="plus-sign">×</div>
+          <div class="logo-container">
+            <div class="veloscope-logo">
+              <img src="https://veloimages.s3.ap-south-1.amazonaws.com/Mangaluru%20Beach%20Festival%202025/proposal_logos/Veloscope_Logo%201.png" alt="Veloscope Logo">
+            </div>
+          </div>
+        </div>
+        <div class="title">Let's Make Maha Marathon Extraordinary</div>
+        <div class="subtitle">Your Success is Our Mission</div>
+      </div>
+
+      <div style="text-align: center; margin: 3rem 0;">
+        <h2 style="color: #2c3e50; margin-bottom: 2rem;">Next Steps</h2>
+
+        <div class="content-grid">
+          <div class="feature-card option-card">
+            <label>
+              <input type="checkbox" class="option-check" />
+              <div class="feature-icon">🤝</div>
+              <div class="feature-title">Partnership Discussion</div>
+              <div class="feature-desc">Detailed discussion about your specific requirements and customization needs</div>
+            </label>
+          </div>
+
+          <div class="feature-card option-card">
+            <label>
+              <input type="checkbox" class="option-check" />
+              <div class="feature-icon">💻</div>
+              <div class="feature-title">Book a live demo</div>
+              <div class="feature-desc">Hands-on demonstration of EventForce platform and Veloscope creative solutions</div>
+            </label>
+          </div>
+
+          <div class="feature-card option-card">
+            <label>
+              <input type="checkbox" class="option-check" />
+              <div class="feature-icon">📝</div>
+              <div class="feature-title">Proposal & Contract</div>
+              <div class="feature-desc">Customized proposal with detailed scope, timeline, and implementation plan</div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-section">
+        <h2>Ready to Elevate Maha Marathon Experience?</h2>
+        <p style="font-size: 1.2rem; margin: 1rem 0;">Let's create something extraordinary together</p>
+        <button class="cta-button" id="ctaBtn" disabled>Let's Get Started</button>
+
+        <div style="margin-top: 2rem; font-size: 0.9rem; opacity: 0.8;">
+          <p>📧 Contact: support@veloscope.in | 📞 Call: +91-8304033534</p>
+          <p>🌐 https://velotales.veloscope.in | https://website.eventforce.ai</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="navigation">
+      <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">Previous</button>
+      <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Next</button>
+    </div>
+
+    <!-- Slide 7: Contact Details Form -->
+    <div class="slide">
+      <div class="slide-header">
+        <div class="title">Share Your Contact Details</div>
+        <div class="subtitle">So we can reach you to discuss your selected options</div>
+      </div>
+
+      <!-- ✅ This is the new wrapper -->
+      <div class="contact-form-container">
+
+        <!-- ✅ Your Selected Options summary stays here -->
+        <div id="selectedOptionsSummary">
+          <h3>Selected Options:</h3>
+          <ol id="selectedOptionsList"></ol>
+        </div>
+
+        <!-- ✅ Your form fields go inside the same container -->
+        <label>
+          Name *<br/>
+          <input type="text" id="contactName" placeholder="Your Name" required>
+        </label>
+
+        <label>
+          Email *<br/>
+          <input type="email" id="contactEmail" placeholder="Your Email" required>
+        </label>
+
+        <label>
+          Phone Number *<br/>
+          <input type="tel" id="contactPhone" placeholder="Your Phone Number" required>
+        </label>
+
+        <label>
+          Additional Notes<br/>
+          <textarea id="contactNotes" placeholder="Any specific questions or message"></textarea>
+        </label>
+
+        <!-- ✅ Submit button stays inside the container too -->
+        <button id="submitContactBtn">Submit</button>
+
+      </div>
+    </div>
+
+
+
+    <script>
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        console.log('Total slides detected:', totalSlides);
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(index) {
+          slides.forEach(slide => slide.classList.remove('active'));
+          slides[index].classList.add('active');
+
+          document.getElementById('currentSlide').textContent = index + 1;
+          document.getElementById('prevBtn').disabled = index === 0;
+          document.getElementById('nextBtn').disabled = index === totalSlides - 1;
+
+          // ✅ Hide Next button only on Slide 6 (index 5)
+          const nextBtn = document.getElementById('nextBtn');
+          nextBtn.style.display = index === 5 ? 'none' : 'inline-block';
+
+          // ✅ Scroll to top of page when slide changes
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+          });
+        }
+
+
+
+        function changeSlide(direction) {
+          currentSlideIndex += direction;
+          if (currentSlideIndex < 0) currentSlideIndex = 0;
+          if (currentSlideIndex >= totalSlides) currentSlideIndex = totalSlides - 1;
+          showSlide(currentSlideIndex);
+        }
+
+        // CTA button logic for Slide 6
+        const optionCheckboxes = document.querySelectorAll('.option-check');
+        const ctaBtn = document.getElementById('ctaBtn');
+
+        optionCheckboxes.forEach(cb => {
+          cb.addEventListener('change', () => {
+            const anyChecked = Array.from(optionCheckboxes).some(cb => cb.checked);
+            if (anyChecked) {
+              ctaBtn.style.background = 'linear-gradient(45deg, #28a745, #218838)';
+              ctaBtn.disabled = false;
+            } else {
+              ctaBtn.style.background = 'linear-gradient(45deg, #FF6B35, #F7931E)';
+              ctaBtn.disabled = true;
+            }
+          });
+        });
+
+        ctaBtn.addEventListener('click', () => {
+          // ✅ 1) Collect selected option titles
+          const selectedOptions = [];
+          optionCheckboxes.forEach(cb => {
+            if (cb.checked) {
+              const title = cb.parentElement.querySelector('.feature-title').textContent.trim();
+              selectedOptions.push(title);
+            }
+          });
+
+          // ✅ 2) Fill the list in Slide 7
+          const list = document.getElementById('selectedOptionsList');
+          list.innerHTML = ''; // Clear previous list
+          selectedOptions.forEach(opt => {
+            const li = document.createElement('li');
+            li.textContent = opt;
+            list.appendChild(li);
+          });
+
+          // ✅ 3) Move to Slide 7
+          changeSlide(1);
+        });
+
+
+
+        showSlide(0);
+
+        document.getElementById('submitContactBtn').addEventListener('click', () => {
+          const name = document.getElementById('contactName').value.trim();
+          const email = document.getElementById('contactEmail').value.trim();
+          const phone = document.getElementById('contactPhone').value.trim();
+          const notes = document.getElementById('contactNotes').value.trim();
+
+          if (!name || !email || !phone) {
+            alert('Please fill in your name, email, and phone number.');
+            return;
+          }
+
+          alert(`Thank you, ${name}! We’ll reach out to you shortly at ${email}.`);
+        });
+
+
+
+
+   </script>
+
+</body>
+</html>
