@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Float, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Float, Boolean, JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from database import Base
@@ -18,6 +18,7 @@ class User(Base):
     logout_events = relationship("LogoutEvent", back_populates="user")
     page_visits = relationship("PageVisit", back_populates="user")
     form_submissions = relationship("FormSubmission", back_populates="user")
+    personalized_presentations = relationship("PersonalizedPresentation", back_populates="user")
 
 class LoginEvent(Base):
     __tablename__ = "login_events"
@@ -71,3 +72,18 @@ class FormSubmission(Base):
     
     # Relationships
     user = relationship("User", back_populates="form_submissions") 
+
+class PersonalizedPresentation(Base):
+    __tablename__ = "personalized_presentations"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    title = Column(String, nullable=True)  # Custom title for the presentation
+    subtitle = Column(String, nullable=True)  # Custom subtitle
+    slides = Column(JSON)  # JSON array of customized slides
+    is_active = Column(Boolean, default=True)  # Whether this personalized presentation is active
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    
+    # Relationships
+    user = relationship("User", back_populates="personalized_presentations") 

@@ -76,6 +76,17 @@ export const analyticsAPI = {
   getMyAnalytics: () => api.get('/analytics/analytics/my-analytics'),
 };
 
+// Personalized Presentations API
+export const personalizedPresentationsAPI = {
+  create: (data: any) => api.post('/forms/forms/personalized-presentations', data),
+  getAll: () => api.get('/forms/forms/personalized-presentations'),
+  getByUserId: (userId: number) => api.get(`/forms/forms/personalized-presentations/${userId}`),
+  update: (presentationId: number, data: any) => 
+    api.put(`/forms/forms/personalized-presentations/${presentationId}`, data),
+  delete: (presentationId: number) => 
+    api.delete(`/forms/forms/personalized-presentations/${presentationId}`),
+};
+
 // Types
 export interface User {
   id: number;
@@ -112,4 +123,26 @@ export interface SimplifiedUserAnalytics {
   total_time_spent_seconds: number;
   total_logins: number;
   has_submitted_form: boolean;
+}
+
+export interface SlideContent {
+  id: number;
+  title: string;
+  subtitle: string;
+  content: Record<string, any>;
+}
+
+export interface PersonalizedPresentation {
+  id: number;
+  user_id: number;
+  title?: string;
+  subtitle?: string;
+  slides: SlideContent[];
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PersonalizedPresentationWithUser extends PersonalizedPresentation {
+  user: User;
 } 

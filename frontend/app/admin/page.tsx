@@ -8,6 +8,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import AdminUserTable from '@/components/AdminUserTable';
 import AnalyticsTable from '@/components/AnalyticsTable';
 import SubmissionsTable from '@/components/SubmissionsTable';
+import PersonalizedPresentationsManager from '@/components/PersonalizedPresentationsManager';
 import { usersAPI, analyticsAPI } from '@/lib/api';
 import { AnimatePresence } from 'framer-motion';
 import { 
@@ -21,7 +22,8 @@ import {
   Clock,
   FileText,
   Play,
-  AlertCircle
+  AlertCircle,
+  Presentation
 } from 'lucide-react';
 
 export default function AdminPage() {
@@ -32,6 +34,7 @@ export default function AdminPage() {
   const [analytics, setAnalytics] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showPersonalizedPresentations, setShowPersonalizedPresentations] = useState(false);
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalVisits: 0,
@@ -215,7 +218,8 @@ export default function AdminPage() {
                 { id: 'overview', label: 'Overview', icon: Activity },
                 { id: 'users', label: 'Users', icon: Users },
                 { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-                { id: 'submissions', label: 'Submissions', icon: FileText }
+                { id: 'submissions', label: 'Submissions', icon: FileText },
+                { id: 'presentations', label: 'Personalized Presentations', icon: Presentation }
               ].map((tab) => {
                 const Icon = tab.icon;
                 return (
@@ -320,6 +324,10 @@ export default function AdminPage() {
             
             {activeTab === 'submissions' && (
               <SubmissionsTable />
+            )}
+            
+            {activeTab === 'presentations' && (
+              <PersonalizedPresentationsManager onClose={() => setActiveTab('overview')} />
             )}
           </motion.div>
         </AnimatePresence>

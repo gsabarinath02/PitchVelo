@@ -1,5 +1,5 @@
-from pydantic import BaseModel, EmailStr
-from typing import Optional, List
+from pydantic import BaseModel, EmailStr, model_validator
+from typing import Optional, List, Dict, Any
 from datetime import datetime
 
 # User schemas
@@ -125,4 +125,47 @@ class FormSubmissionWithUser(BaseModel):
     user: UserResponse
     
     class Config:
-        from_attributes = True 
+        from_attributes = True
+
+# Personalized Presentation schemas
+class SlideContent(BaseModel):
+    id: int
+    title: str
+    subtitle: str
+    content: Dict[str, Any]  # JSON content for the slide
+
+class PersonalizedPresentationBase(BaseModel):
+    title: Optional[str] = None
+    subtitle: Optional[str] = None
+    slides: List[SlideContent]
+    is_active: bool = True
+    
+    @model_validator(mode='before')
+    @classmethod
+    def convert_slides(cls, values):
+        if isinstance(values, dict) and 'slides' in values:
+            slides = values['slides']
+            if isinstance(slides, list) and len(slides) > 0 and isinstance(slides[0], dict):
+                values['slides'] = [SlideContent(**slide) for slide in slides]
+        return values
+
+class PersonalizedPresentationCreate(PersonalizedPresentationBase):
+    user_id: int
+
+class PersonalizedPresentationUpdate(BaseModel):
+    title: Optional[str] = None
+    subtitle: Optional[str] = None
+    slides: Optional[List[SlideContent]] = None
+    is_active: Optional[bool] = None
+
+class PersonalizedPresentationResponse(PersonalizedPresentationBase):
+    id: int
+    user_id: int
+    created_at: datetime
+    updated_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+class PersonalizedPresentationWithUser(PersonalizedPresentationResponse):
+    user: UserResponse 

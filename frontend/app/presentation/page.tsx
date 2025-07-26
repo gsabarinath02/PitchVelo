@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import PresentationViewer from '@/components/PresentationViewer';
+import PersonalizedPresentationViewer from '@/components/PersonalizedPresentationViewer';
 import FormSubmission from '@/components/FormSubmission';
 import FormSubmissionDetails from '@/components/FormSubmissionDetails';
 import SubmissionSuccess from '@/components/SubmissionSuccess';
@@ -286,7 +286,7 @@ export default function PresentationPage() {
               </motion.div>
             ) : !showForm ? (
               <div className="space-y-6">
-                <PresentationViewer
+                <PersonalizedPresentationViewer
                   currentSlide={currentSlide}
                   setCurrentSlide={setCurrentSlide}
                   onComplete={() => setShowForm(true)}
